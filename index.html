@@ -75,8 +75,12 @@
                             <label class="form-check-label"> {{ account.text }} </label>
                         </div>
                     </div>
+                    <span> {{checkedNames}} </span>
                 </div>
             </div>
+        </div>
+        <div v-for="name in checkedNames">
+            {{name}}
         </div>
         <div class="row">
             <div class="col" id="demo">

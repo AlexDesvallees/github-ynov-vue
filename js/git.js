@@ -23,10 +23,10 @@ var demo = new Vue({
             date: ''
         }],
         accounts: [
-            { id: 0, text: 'AlexDesvallees' },
-            { id: 1, text: 'GFourny' }
+            { text: 'AlexDesvallees' },
+            { text: 'GFourny' }
         ],
-        checkedNames: ['AlexDesvallees']
+        checkedNames: []
     },
 
     created: function () {
@@ -51,12 +51,19 @@ var demo = new Vue({
         fetchData: function () {
             var xhr = new XMLHttpRequest()
             var self = this
-            xhr.open('GET', apiURL + this.checkedNames + '/' + this.selected + '/commits?' + self.currentBranch)
-            xhr.onload = function () {
-                self.commits = JSON.parse(xhr.responseText)
-                console.log(self.commits[0].html_url)
-            }
-            xhr.send()
+
+            // if (this.checkedNames.countain(',')) {
+            //     this.checkedNames.split(',')
+            // }
+            // else {
+                xhr.open('GET', apiURL + this.checkedNames + '/' + this.selected + '/commits?' + self.currentBranch)
+                xhr.onload = function () {
+                    self.commits = JSON.parse(xhr.responseText)
+                    console.log(self.commits[0].html_url)
+                }
+                xhr.send()
+            // }
+
         }
     }
 })
