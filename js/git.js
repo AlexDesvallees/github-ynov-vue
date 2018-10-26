@@ -5,6 +5,10 @@ const apiURL = 'https://api.github.com/repos/'
  * Actual demo
  */
 
+// Vue.component('date-picker', function () {
+//     template: '<input/>'
+// });
+
 var demo = new Vue({
 
     el: '#demo',
@@ -18,15 +22,15 @@ var demo = new Vue({
             { name: 'github-ynov-vue' },
             { name: 'hello-world' }
         ],
-        selected: 'github-ynov-vue',
-        periode: [{
-            date: ''
-        }],
+        projectSelected: 'github-ynov-vue',
+        dateDebut: '',
+        dateFin: '',
         accounts: [
             { text: 'AlexDesvallees' },
             { text: 'GFourny' }
         ],
-        checkedNames: []
+        checkedNames: ['AlexDesvallees'],
+        resultList: []
     },
 
     created: function () {
@@ -34,7 +38,13 @@ var demo = new Vue({
     },
 
     watch: {
-        currentBranch: 'fetchData'
+        currentBranch: 'fetchData',
+        projectSelected: (unProj) => {
+            console.log("the new selected project is " + unProj)
+            var project_name = unProj
+
+            console.log("the new selected project is " + project_name)
+        }
     },
 
     filters: {
@@ -51,19 +61,39 @@ var demo = new Vue({
         fetchData: function () {
             var xhr = new XMLHttpRequest()
             var self = this
+            this.resultList = []
 
-            // if (this.checkedNames.countain(',')) {
-            //     this.checkedNames.split(',')
-            // }
-            // else {
-                xhr.open('GET', apiURL + this.checkedNames + '/' + this.selected + '/commits?' + self.currentBranch)
+            console.log(this.projectSelected)
+            this.checkedNames.forEach(function (name) {
+
+                // version sans la période
+                xhr.open('GET', apiURL + name + '/' + self.projectSelected + '/commits?' + self.currentBranch, false)
+
+                // xhr.open('GET', apiURL + name + '/' + self.projectSelected + '/commits?since='+ self.dateDebut + '&until='+ self.dateFin, false)
+                // console.log(apiURL + name + '/' + self.projectSelected + '/commits?since='+ self.dateDebut + '&until='+ self.dateFin)
                 xhr.onload = function () {
                     self.commits = JSON.parse(xhr.responseText)
-                    console.log(self.commits[0].html_url)
+                    // Version sans la période
+                    if (self.commits[0]) {
+                        self.resultList.push(self.commits)
+                    }
+
+                    // self.resultList.push(self.commits)
+                    // console.log(self.resultList)
                 }
                 xhr.send()
-            // }
-
+            });
         }
     }
 })
+
+$(function () {
+
+    $('input[name="daterange"]').daterangepicker({
+        opens: 'left'
+    }, function (start, end, label) {
+        console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        demo.dateDebut = start.format('YYYY-MM-DD')
+        demo.dateFin = end.format('YYYY-MM-DD')
+    });
+});

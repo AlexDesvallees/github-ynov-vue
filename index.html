@@ -21,7 +21,6 @@
 <body>
     <div id="demo">
 
-
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="navBar">
             <a class="navbar-brand mb-0 h1 align-middle" style="color:green">Application GitHub Ynov</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText"
@@ -34,21 +33,8 @@
         <div class="row">
             <!-- Colonne 1 -->
             <div class="col-4">
-                <!-- <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
-                    aria-expanded="false">
-                    Choix du Projet
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <div class="form-check" v-for="projet in projets">
-                        <input class="form-check-input" type="button" v-bind:value="projet.name" v-model="projet.name" v-on:created="fetchData">
-                        <label class="form-check-label"> {{ projet.name }} </label>
-                    </div>
-                    
-                </div>
-            </div> -->
                 <label>Choix du Projet</label>
-                <select class="form-control" id="test" v-model="selected">
+                <select class="form-control" id="test" v-model="projectSelected">
                     <option v-for="projet in projets" v-bind:value="projet.name" v-on:change="fetchData">
                         {{ projet.name }}
                     </option>
@@ -59,7 +45,9 @@
             <div class="col" id="period">
                 <label>Choix de la Période</label>
                 <br/>
-                <input type="text" name="daterange" v-model="periode.date" />
+                <input type="text" name="daterange" v-once/> {{dateDebut}} {{dateFin}}
+                <!-- <date-picker date-format="yy-mm-dd" v-once></date-picker>
+                <p>{{ date }}</p> -->
             </div>
 
             <!-- Colonne 3 -->
@@ -75,53 +63,67 @@
                             <label class="form-check-label"> {{ account.text }} </label>
                         </div>
                     </div>
-                    <span> {{checkedNames}} </span>
                 </div>
             </div>
         </div>
-        <div v-for="name in checkedNames">
-            {{name}}
-        </div>
-        <div class="row">
-            <div class="col" id="demo">
-                <h1>Latest Vue.js Commits</h1>
-                <template v-for="branch in branches">
-                    <input type="radio" :id="branch" :value="branch" name="branch" v-model="currentBranch">
-                    <label :for="branch">{{ branch }}</label>
-                </template>
-                <p>vuejs/vue@{{ currentBranch }}</p>
-                <ul>
-                    <li v-for="record in commits">
-                        <a :href="record.html_url" target="_blank" class="commit">{{ record.sha.slice(0, 7) }}</a>
-                        -
-                        <span class="message">{{ record.commit.message | truncate }}</span>
-                        <br> by
-                        <span class="author">
-                            <a :href="record.author.html_url" target="_blank">{{ record.commit.author.name }}</a>
-                        </span>
-                        at
-                        <span class="date">{{ record.commit.author.date | formatDate }}</span>
-                    </li>
-                </ul>
+
+        <!-- Ligne des résultats -->
+        <div v-for="result in resultList">
+            <div class="card">
+
+                <h2 class="card-header">
+
+                    <!-- Nom du propriétaire du repo, au 3ème emplacement dans l'url -->
+                    {{result[0].html_url.split("/")[3]}}
+
+                    <a :href="'https://github.com/' + result[0].html_url.split('/')[3] + '/' + projectSelected" class="btn btn-primary">Projet Github</a>
+
+                </h2>
+
+                <div class="card-body">
+                    <div class="col" id="demo">
+                        <h1>Latest Vue.js Commits</h1>
+                        <template v-for="branch in branches">
+                            <input type="radio" :id="branch" :value="branch" name="branch" v-model="currentBranch">
+                            <label :for="branch">{{ branch }}</label>
+                        </template>
+                        <p>vuejs/vue@{{ currentBranch }}</p>
+                        <ul v-for="record in result">
+                            <div class="row">
+                                <div class="col-2">
+                                    <img :src="record.author.avatar_url" width="50px" height="auto">
+                                </div>
+                                <div>
+                                    <a :href="record.html_url" target="_blank" class="commit">{{ record.sha.slice(0, 7) }}</a>
+                                    -
+                                    <span class="message">{{ record.commit.message | truncate }}</span>
+                                    <br> by
+                                    <span class="author">
+                                        <a :href="record.author.html_url" target="_blank">{{ record.commit.author.name }}</a>
+                                    </span>
+                                    at
+                                    <span class="date">{{ record.commit.author.date | formatDate }}</span>
+                                </div>
+                            </div>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
+    <!-- Section for the calendar -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
         crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
         crossorigin="anonymous"></script>
     <script src="https://unpkg.com/vue"></script>
-    <script src="js/app.js"></script>
     <script src="js/git.js"></script>
-    <!-- Section for the calendar -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 </body>
 
