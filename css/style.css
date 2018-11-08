@@ -16,6 +16,15 @@
     padding: 0px;
 }
 
+.title {
+    color: #f66;
+    font-size: 2rem;
+}
+
+.errorList {
+    display: inline;
+}
+
 #demo {
   font-family: 'Helvetica', Arial, sans-serif;
 }

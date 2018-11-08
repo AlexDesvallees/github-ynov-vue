@@ -1,13 +1,4 @@
 const apiURL = 'https://api.github.com/repos/'
-// var apiURL = 'https://api.github.com/repos/AlexDesvallees/github-ynov-vue/commits?'
-
-/**
- * Actual demo
- */
-
-// Vue.component('date-picker', function () {
-//     template: '<input/>'
-// });
 
 var demo = new Vue({
 
@@ -23,18 +14,20 @@ var demo = new Vue({
             { name: 'hello-world' }
         ],
         projectSelected: 'github-ynov-vue',
-        dateDebut: '',
-        dateFin: '',
+        dateDebut: '2018-01-01',
+        dateFin: '2018-12-31',
         accounts: [
             { text: 'AlexDesvallees' },
             { text: 'GFourny' }
         ],
         checkedNames: ['AlexDesvallees'],
-        resultList: []
+        resultList: [],
+        errorList: []
     },
 
     created: function () {
-        this.fetchData()
+        // Besoin de le mettre en commentaire pour ne pas avoir de lancement de requête au chargement de la page
+        // this.fetchData()
     },
 
     watch: {
@@ -62,24 +55,46 @@ var demo = new Vue({
             var xhr = new XMLHttpRequest()
             var self = this
             this.resultList = []
+            this.errorList = []
 
             console.log(this.projectSelected)
             this.checkedNames.forEach(function (name) {
 
-                // version sans la période
-                xhr.open('GET', apiURL + name + '/' + self.projectSelected + '/commits?' + self.currentBranch, false)
-
-                // xhr.open('GET', apiURL + name + '/' + self.projectSelected + '/commits?since='+ self.dateDebut + '&until='+ self.dateFin, false)
-                // console.log(apiURL + name + '/' + self.projectSelected + '/commits?since='+ self.dateDebut + '&until='+ self.dateFin)
+                xhr.open('GET', apiURL + name + '/' + self.projectSelected + '/commits?since=' + self.dateDebut + '&until=' + self.dateFin, false)
+                console.log(apiURL + name + '/' + self.projectSelected + '/commits?since=' + self.dateDebut + '&until=' + self.dateFin)
                 xhr.onload = function () {
                     self.commits = JSON.parse(xhr.responseText)
-                    // Version sans la période
+
                     if (self.commits[0]) {
                         self.resultList.push(self.commits)
                     }
+                    else {
+                        self.errorList.push(name)
+                    }
 
-                    // self.resultList.push(self.commits)
-                    // console.log(self.resultList)
+                    console.log(self.errorList)
+                }
+                xhr.send()
+            });
+        },
+        fetchReadme: function (name) {
+            var xhr = new XMLHttpRequest()
+            var self = this
+
+            console.log(this.projectSelected)
+            this.checkedNames.forEach(function (name) {
+
+                xhr.open('GET', apiURL + name + '/' + self.projectSelected + '/readme')
+                xhr.setRequestHeader('Accept' , 'application/vnd.github.VERSION.html')
+                xhr.onload = function () {
+                    if(xhr.status == 404){
+                        self.readme = "Pas de readme dans ce projet pour cette personne"
+                    }
+                    else {
+                        console.log(self.readme)
+                        self.readme = xhr.responseText
+                    }
+                    document.getElementById("readme-modal").innerHTML = self.readme
                 }
                 xhr.send()
             });

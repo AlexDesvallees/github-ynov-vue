@@ -8,7 +8,6 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
-    <!-- <link rel="icon" href="../../favicon.ico"> -->
 
     <title>Bootstrap Github Commits</title>
 
@@ -21,13 +20,17 @@
 <body>
     <div id="demo">
 
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="navBar">
+        <div class="mx-auto title" style="width: 200px;">
+            Application Github Ynov
+        </div>
+
+        <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="navBar">
             <a class="navbar-brand mb-0 h1 align-middle" style="color:green">Application GitHub Ynov</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText"
                 aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-        </nav>
+        </nav> -->
         <!-- </div> -->
 
         <div class="row">
@@ -35,7 +38,8 @@
             <div class="col-4">
                 <label>Choix du Projet</label>
                 <select class="form-control" id="test" v-model="projectSelected">
-                    <option v-for="projet in projets" v-bind:value="projet.name" v-on:change="fetchData">
+                    <option v-for="projet in projets" v-bind:value="projet.name">
+                        <!-- <option v-for="projet in projets" v-bind:value="projet.name" v-on:change="fetchData"> -->
                         {{ projet.name }}
                     </option>
                 </select>
@@ -44,26 +48,34 @@
             <!-- Colonne 2 -->
             <div class="col" id="period">
                 <label>Choix de la Période</label>
-                <br/>
-                <input type="text" name="daterange" v-once/> {{dateDebut}} {{dateFin}}
-                <!-- <date-picker date-format="yy-mm-dd" v-once></date-picker>
-                <p>{{ date }}</p> -->
+                <br />
+                <input type="text" name="daterange" v-once />
             </div>
 
             <!-- Colonne 3 -->
             <div class="col">
                 <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
-                        aria-expanded="false">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
                         Choix des Comptes
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <div class="form-check" v-for="account in accounts">
-                            <input class="form-check-input" type="checkbox" v-bind:value="account.text" v-model="checkedNames" v-on:change="fetchData">
+                            <!-- <input class="form-check-input" type="checkbox" v-bind:value="account.text" v-model="checkedNames" v-on:change="fetchData"> -->
+                            <input class="form-check-input" type="checkbox" v-bind:value="account.text" v-model="checkedNames">
                             <label class="form-check-label"> {{ account.text }} </label>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="row">
+            <button class="btn mx-auto" type="button" id="btnValidationSelection" v-on:click="fetchData">Valider</button>
+        </div>
+        <div class="alert alert-info" role="alert" v-if="errorList[0]">
+            Aucun commit trouvé pour les projets de :
+            <div v-for="erreur in errorList" class="errorList">
+                {{erreur}},
             </div>
         </div>
 
@@ -76,7 +88,10 @@
                     <!-- Nom du propriétaire du repo, au 3ème emplacement dans l'url -->
                     {{result[0].html_url.split("/")[3]}}
 
-                    <a :href="'https://github.com/' + result[0].html_url.split('/')[3] + '/' + projectSelected" class="btn btn-primary">Projet Github</a>
+                    <a :href="'https://github.com/' + result[0].html_url.split('/')[3] + '/' + projectSelected" class="btn btn-primary">Projet
+                        Github</a>
+                    <button class="btn" type="button" id="btnReadMe" data-toggle="modal" data-target="#modalReadme"
+                        v-on:click="fetchReadme(result[0].html_url.split('/')[3])">ReadMe</button>
 
                 </h2>
 
@@ -94,12 +109,14 @@
                                     <img :src="record.author.avatar_url" width="50px" height="auto">
                                 </div>
                                 <div>
-                                    <a :href="record.html_url" target="_blank" class="commit">{{ record.sha.slice(0, 7) }}</a>
+                                    <a :href="record.html_url" target="_blank" class="commit">{{ record.sha.slice(0, 7)
+                                        }}</a>
                                     -
                                     <span class="message">{{ record.commit.message | truncate }}</span>
                                     <br> by
                                     <span class="author">
-                                        <a :href="record.author.html_url" target="_blank">{{ record.commit.author.name }}</a>
+                                        <a :href="record.author.html_url" target="_blank">{{ record.commit.author.name
+                                            }}</a>
                                     </span>
                                     at
                                     <span class="date">{{ record.commit.author.date | formatDate }}</span>
@@ -107,6 +124,28 @@
                             </div>
                         </ul>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Section -->
+    <div class="modal fade" id="modalReadme" tabindex="-1" role="dialog" aria-labelledby="modalReadmeTitle"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalReadmeTitle">ReadMe</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="readme-modal">
+                    <!-- Contenu géré dynamiquement -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
                 </div>
             </div>
         </div>
