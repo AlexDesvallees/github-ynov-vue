@@ -7,3 +7,7 @@ Reste à faire :
 - Fichier ReadMe à construire avec plus de détails pour présenter l'application
 - Ajout d'un bouton pour consulter le readme d'un projet
 - AJout d'un bouton valider pour la sélection des projets github de personnes pour une période
+
+Objectif du jour : 
+
+- Période fonctionnelle + btn readme + btn valider + début css
